@@ -1,0 +1,14 @@
+:root {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#border {
+    height: 20vh;
+    width: 100%;
+    border-bottom: 4px black solid;
+}
