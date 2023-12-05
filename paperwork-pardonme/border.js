@@ -1,5 +1,5 @@
 import "./style.css";
-// import { setupCounter } from './counter.js'
+import { DOM } from './dom.js'
 
 async function getPersons() {
     try {
@@ -38,3 +38,8 @@ persons.then((result) => {
     createPassport(result.results[0]);
     document.querySelector("#border").innerHTML = `<img src=${result.results[0].picture.large}></img>`;
 });
+
+DOM.discrepancy.addEventListener(("input"), function (){
+    console.log(DOM.reason.selectedIndex !== 0);
+    DOM.deny.style.display = (DOM.reason.selectedIndex !== 0 ? "flex" : "none");
+})
