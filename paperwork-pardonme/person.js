@@ -1,8 +1,9 @@
 // this is just a sample person for reference
 // i don't want to keep making api calls
-const person = {
+const data = {
     results: [
         {
+            //person starts here
             gender: "male",
             name: {
                 title: "Mr",
