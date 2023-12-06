@@ -20,8 +20,7 @@ async function getPersons() {
 }
 
 function createPassport(person) {
-    trollPerson(person);
-    const passport = window.open("passport.html", "passport", "popup");
+    const passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
     passport.onload = (event) => {
         passport.document.querySelector("body").insertAdjacentHTML(
             "beforeend",
@@ -37,6 +36,10 @@ function createPassport(person) {
             </section>
             `
         );
+        passport.onbeforeunload = function () {
+            console.log("hi");
+            document.querySelector("#passport").disabled = false;
+        };
     };
 }
 
@@ -44,9 +47,17 @@ const persons = getPersons();
 persons.then((result) => {
     result.results.forEach((person) => {
         person.registered.expire = getRandomInt(5);
+        trollPerson(person);
     });
-    createPassport(result.results[0]);
-    document.querySelector("#border").innerHTML = `<img src=${result.results[0].picture.large}></img>`;
+    const person = result.results[0];
+    document.querySelector("#border").innerHTML = `
+    <img src=${person.picture.large}></img>
+    <button id="passport">open passport</button>
+    `;
+    document.querySelector("#passport").addEventListener("click", function () {
+        createPassport(person);
+        this.disabled = true;
+    });
 });
 
 DOM.discrepancy.addEventListener("input", function () {

@@ -12,3 +12,8 @@ body {
     width: 100%;
     border-bottom: 4px black solid;
 }
+
+/* button to open passport */
+#passport {
+    display: flex;
+}
