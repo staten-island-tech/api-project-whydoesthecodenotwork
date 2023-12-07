@@ -1,7 +1,7 @@
 const DOM = {
     discrepancy: document.querySelector("#discrepancy"),
     reason: document.querySelector("#reason"),
-    deny: document.querySelector("#deny"),
+    stamp: document.querySelector("#stamp"),
     border: document.querySelector("#border"),
 };
 

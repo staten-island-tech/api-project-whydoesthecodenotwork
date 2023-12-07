@@ -4,14 +4,13 @@ import { trollPerson, getRandomInt } from "./troll.js";
 
 async function getPersons() {
     try {
-        const response = await fetch("https://randomuser.me/api/?exc=login,phone,cell,email&results=1");
+        const response = await fetch("https://randomuser.me/api/?exc=login,phone,cell,email&results=5");
         if (response.error) {
             console.log("uh oh");
             throw new Error("api exploded");
         }
         // response.json() returns a promise so await it
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (error) {
         console.log("💀", error);
@@ -19,8 +18,9 @@ async function getPersons() {
     }
 }
 
+var passport;
 function createPassport(person) {
-    const passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
+    passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
     passport.onload = (event) => {
         passport.document.querySelector("body").insertAdjacentHTML(
             "beforeend",
@@ -43,13 +43,24 @@ function createPassport(person) {
     };
 }
 
-const persons = getPersons();
-persons.then((result) => {
-    result.results.forEach((person) => {
-        person.registered.expire = getRandomInt(5);
-        trollPerson(person);
+var persons = [];
+var errors = [];
+var personIndex = 0;
+function day() {
+    const data = getPersons();
+    data.then((result) => {
+        persons = result.results;
+        persons.forEach((person) => {
+            person.registered.expire = getRandomInt(5);
+            person.errors = trollPerson(person);
+        });
+        applicant(persons[personIndex]);
     });
-    const person = result.results[0];
+}
+
+function applicant(person) {
+    console.log(person);
+    errors = person.errors;
     document.querySelector("#border").innerHTML = `
     <img src=${person.picture.large}></img>
     <button id="passport">open passport</button>
@@ -58,11 +69,43 @@ persons.then((result) => {
         createPassport(person);
         this.disabled = true;
     });
-});
+}
 
 DOM.discrepancy.addEventListener("input", function () {
-    DOM.deny.style.display = DOM.reason.selectedIndex !== 0 ? "flex" : "none";
     console.log(DOM.reason.value);
 });
 
-DOM.deny.addEventListener("input", function () {});
+DOM.stamp.addEventListener("click", function () {
+    if (DOM.reason.selectedIndex === 0) {
+        if (errors.length === 0) {
+            console.log("awesome");
+        } else {
+            alert("you failed and will now be exploded because:", errors);
+        }
+    } else {
+        // console.log(DOM.reason.value);
+        // console.log(errors);
+        if (errors.includes(DOM.reason.value)) {
+            console.log("awesome");
+        } else {
+            console.log(errors.length);
+            if (errors.length === 0) {
+                // the documents were fine
+                alert("wrongful denial. you will now be exploded");
+            } else {
+                // wrong error
+                alert("wrong denial reason. you will now be exploded");
+            }
+        }
+        DOM.reason.selectedIndex = 0;
+    }
+    personIndex++;
+    if (passport) {
+        passport.close();
+    }
+    if (personIndex <= persons.length) {
+        applicant(persons[personIndex]);
+    }
+});
+
+day();
