@@ -1,10 +1,13 @@
 const DOM = {
-    discrepancy: document.querySelector("#discrepancy"),
-    reason: document.querySelector("#reason"),
-    stamp: document.querySelector("#stamp"),
-    border: document.querySelector("#border"),
-    heading: document.querySelector("#heading"),
-    controls: document.querySelector("#controls"),
+    discrepancy: document.getElementById("discrepancy"),
+    reason: document.getElementById("reason"),
+    stamp: document.getElementById("stamp"),
+    border: document.getElementById("border"),
+    heading: document.getElementById("heading"),
+    controls: document.getElementById("controls"),
+    eod: document.getElementById("endofday"),
+    queue: document.getElementById("queue"),
+    day: document.getElementById("day"),
 };
 
 export { DOM };

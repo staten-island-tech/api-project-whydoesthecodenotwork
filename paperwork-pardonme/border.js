@@ -7,11 +7,14 @@ const gameData = {
     persons: [],
     passport: null,
     errors: [],
+    correct: 0,
+    wrong: 0,
+    queueSize: 3,
 };
 
 async function getPersons() {
     try {
-        const response = await fetch("https://randomuser.me/api/?exc=login,phone,cell,email&results=1");
+        const response = await fetch(`https://randomuser.me/api/?exc=login,phone,cell,email&results=${gameData.queueSize}`);
         if (response.error) {
             console.log("uh oh");
             throw new Error("api exploded");
@@ -55,7 +58,10 @@ function day() {
     gameData.persons = [];
     gameData.errors = [];
     gameData.personIndex = 0;
-    DOM.controls.display = "flex";
+    gameData.correct = 0;
+    gameData.wrong = 0;
+    gameData.day++;
+    DOM.day.innerText = `Day ${gameData.day}`;
     const data = getPersons();
     data.then((result) => {
         gameData.persons = result.results;
@@ -69,7 +75,8 @@ function day() {
 function applicant(person) {
     console.log(person);
     gameData.errors = person.errors;
-    document.querySelector("#border").innerHTML = `
+    DOM.queue.innerText = `${gameData.queueSize - gameData.personIndex} people remaining`;
+    DOM.border.innerHTML = `
     <img src=${person.picture.large}></img>
     <button id="passport">open passport</button>
     `;
@@ -87,16 +94,20 @@ DOM.stamp.addEventListener("click", function () {
     if (DOM.reason.selectedIndex === 0) {
         if (gameData.errors.length === 0) {
             console.log("awesome");
+            gameData.correct++;
         } else {
             alert("you failed and will now be exploded");
-            console.log("haha", errors);
+            console.log("haha", gameData.errors);
+            gameData.wrong++;
         }
     } else {
         // console.log(DOM.reason.value);
         // console.log(errors);
         if (gameData.errors.includes(DOM.reason.value)) {
             console.log("awesome");
+            gameData.correct++;
         } else {
+            gameData.wrong++;
             if (gameData.errors.length === 0) {
                 // the documents were fine
                 alert("wrongful denial. you will now be exploded");
@@ -121,11 +132,14 @@ DOM.stamp.addEventListener("click", function () {
 day();
 
 function endDay() {
-    DOM.border.innerHTML = ``;
-    DOM.controls.display = "none";
-    DOM.heading.innerHTML = `<button id="nextday">next day</button>`;
-    document.getElementById("nextday").addEventListener("click", function () {
+    DOM.eod.innerHTML = `
+    <h2>end of day ${gameData.day}</h2>
+    <h3>you got ${gameData.correct} right and ${gameData.wrong} wrong</h3>
+    <button autofocus>OK</button>
+    `;
+    DOM.eod.querySelector("button").addEventListener("click", function () {
         day();
-        this.remove();
+        DOM.eod.close();
     });
+    DOM.eod.showModal();
 }
