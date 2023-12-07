@@ -13,23 +13,45 @@ function rng(roll, requirement) {
 
 function trollPerson(person) {
     const error = [];
-    if (rng(getRandomInt(100), 75)) {
+
+    // wrong gender
+    if (rng(getRandomInt(100), 90)) {
         person.gender = person.name.first;
         error.push("gender");
     }
-    if (rng(getRandomInt(100), 75)) {
+
+    // wrong picture
+    if (rng(getRandomInt(100), 90)) {
         const replacement = getRandomInt(100);
         // matches filename
         const re = /[0,1,2,3,4,5,6,7,8,9].\.jpg/;
         if (replacement !== person.picture.medium.match()) {
             // give up if the rng says so
-            console.log(person.picture.medium);
             person.picture.medium = person.picture.medium.replace(re, `${replacement}.jpg`);
-            console.log(person.picture.medium);
             error.push("photo");
         }
     }
-    console.log(error)
+
+    // wrong place
+    if (rng(getRandomInt(100), 90)) {
+        person.location.country = "Real Place Land";
+        error.push("location");
+    }
+
+    // wrong place
+    const currentDate = new Date();
+    person.registered.expire = getRandomInt(5);
+    if (rng(getRandomInt(100), 50)) {
+        const date = new Date(person.registered.date);
+        date.setFullYear(currentDate.getFullYear() - (person.registered.expire + getRandomInt(3)));
+        person.registered.date = date.toISOString();
+        error.push("expired");
+    } else {
+        const date = new Date(person.registered.date);
+        date.setFullYear(currentDate.getFullYear() - getRandomInt(person.registered.expire - 1));
+        person.registered.date = date.toISOString();
+    }
+    console.log(error);
     return error;
 }
 

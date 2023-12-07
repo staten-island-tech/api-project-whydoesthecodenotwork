@@ -1,10 +1,17 @@
 import "./styles/style.css";
 import { DOM } from "./dom.js";
 import { trollPerson, getRandomInt } from "./troll.js";
+const gameData = {
+    day: 0,
+    personIndex: 0,
+    persons: [],
+    passport: null,
+    errors: [],
+};
 
 async function getPersons() {
     try {
-        const response = await fetch("https://randomuser.me/api/?exc=login,phone,cell,email&results=5");
+        const response = await fetch("https://randomuser.me/api/?exc=login,phone,cell,email&results=1");
         if (response.error) {
             console.log("uh oh");
             throw new Error("api exploded");
@@ -18,11 +25,10 @@ async function getPersons() {
     }
 }
 
-var passport;
 function createPassport(person) {
-    passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
-    passport.onload = (event) => {
-        passport.document.querySelector("body").insertAdjacentHTML(
+    gameData.passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
+    gameData.passport.onload = (event) => {
+        gameData.passport.document.querySelector("body").insertAdjacentHTML(
             "beforeend",
             `
             <h2>${person.name.first}'s passport</h2>
@@ -31,36 +37,38 @@ function createPassport(person) {
                 <p>name: ${person.name.first} ${person.name.last}</p>
                 <p>sex: ${person.gender}</p>
                 <p>place of origin: ${person.location.state}</p>
-                <p>dob: ${person.dob.date}</p>
-                <p>issue date: ${person.registered.date}, expires after ${person.registered.expire} year${person.registered.expire > 1 ? "s" : ""}</p>
+                <p>dob: ${new Date(person.dob.date).toDateString().substring(4)}</p>
+                <p>issue date: ${new Date(person.registered.date).toDateString().substring(4)}, expires after ${person.registered.expire} year${
+                person.registered.expire > 1 ? "s" : ""
+            }</p>
             </section>
             `
         );
-        passport.onbeforeunload = function () {
+        gameData.passport.onbeforeunload = function () {
             console.log("hi");
             document.querySelector("#passport").disabled = false;
         };
     };
 }
 
-var persons = [];
-var errors = [];
-var personIndex = 0;
 function day() {
+    gameData.persons = [];
+    gameData.errors = [];
+    gameData.personIndex = 0;
+    DOM.controls.display = "flex";
     const data = getPersons();
     data.then((result) => {
-        persons = result.results;
-        persons.forEach((person) => {
-            person.registered.expire = getRandomInt(5);
+        gameData.persons = result.results;
+        gameData.persons.forEach((person) => {
             person.errors = trollPerson(person);
         });
-        applicant(persons[personIndex]);
+        applicant(gameData.persons[gameData.personIndex]);
     });
 }
 
 function applicant(person) {
     console.log(person);
-    errors = person.errors;
+    gameData.errors = person.errors;
     document.querySelector("#border").innerHTML = `
     <img src=${person.picture.large}></img>
     <button id="passport">open passport</button>
@@ -77,19 +85,19 @@ DOM.discrepancy.addEventListener("input", function () {
 
 DOM.stamp.addEventListener("click", function () {
     if (DOM.reason.selectedIndex === 0) {
-        if (errors.length === 0) {
+        if (gameData.errors.length === 0) {
             console.log("awesome");
         } else {
-            alert("you failed and will now be exploded because:", errors);
+            alert("you failed and will now be exploded");
+            console.log("haha", errors);
         }
     } else {
         // console.log(DOM.reason.value);
         // console.log(errors);
-        if (errors.includes(DOM.reason.value)) {
+        if (gameData.errors.includes(DOM.reason.value)) {
             console.log("awesome");
         } else {
-            console.log(errors.length);
-            if (errors.length === 0) {
+            if (gameData.errors.length === 0) {
                 // the documents were fine
                 alert("wrongful denial. you will now be exploded");
             } else {
@@ -99,13 +107,25 @@ DOM.stamp.addEventListener("click", function () {
         }
         DOM.reason.selectedIndex = 0;
     }
-    personIndex++;
-    if (passport) {
-        passport.close();
+    gameData.personIndex++;
+    if (gameData.passport) {
+        gameData.passport.close();
     }
-    if (personIndex <= persons.length) {
-        applicant(persons[personIndex]);
+    if (gameData.personIndex < gameData.persons.length) {
+        applicant(gameData.persons[gameData.personIndex]);
+    } else {
+        endDay();
     }
 });
 
 day();
+
+function endDay() {
+    DOM.border.innerHTML = ``;
+    DOM.controls.display = "none";
+    DOM.heading.innerHTML = `<button id="nextday">next day</button>`;
+    document.getElementById("nextday").addEventListener("click", function () {
+        day();
+        this.remove();
+    });
+}
