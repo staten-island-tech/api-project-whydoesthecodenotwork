@@ -12,6 +12,7 @@ const gameData = {
     wrong: 0,
     queueSize: 3,
     money: 0,
+    trolls: [],
 };
 
 async function getPersons(count) {
@@ -60,6 +61,7 @@ function createPassport(person) {
 function day() {
     gameData.day++;
     gameData.queueSize = days[gameData.day].queue;
+    gameData.trolls = days[gameData.day].trolls;
     gameData.persons = [];
     gameData.errors = [];
     gameData.personIndex = 0;
@@ -75,8 +77,9 @@ function day() {
             // continue
             gameData.persons = result.results;
             gameData.persons.forEach((person) => {
-                person.errors = trollPerson(person);
+                person.errors = trollPerson(person, gameData.trolls);
             });
+            // summon the first applicant
             applicant(gameData.persons[gameData.personIndex]);
         }
     });
@@ -147,8 +150,8 @@ function endDay() {
     <h3>you got ${gameData.correct} right and ${gameData.wrong} wrong</h3>
     <button autofocus>OK</button>
     `;
+    day();
     DOM.eod.querySelector("button").addEventListener("click", function () {
-        day();
         DOM.eod.close();
     });
     DOM.eod.showModal();

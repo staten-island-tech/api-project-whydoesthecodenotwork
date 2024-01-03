@@ -11,16 +11,39 @@ function rng(roll, requirement) {
     return 0;
 }
 
-function trollPerson(person) {
+function trollPerson(person, trolls) {
     const error = [];
 
-    // wrong gender
-    if (rng(getRandomInt(100), 90)) {
-        person.gender = person.name.first;
-        error.push("gender");
-    }
+    // assign all persons a non-expired date before trolling them
+    const currentDate = new Date();
+    const date = new Date(person.registered.date);
+    person.registered.expire = getRandomInt(5);
+    date.setFullYear(currentDate.getFullYear() - getRandomInt(person.registered.expire - 1));
+    person.registered.date = date.toISOString();
 
-    // wrong picture
+    // won't you take me to
+    const funkyTown = {
+        gender: function (person) {
+            person.gender = person.name.first;
+            error.push("gender");
+        },
+        date: function (person) {
+            console.log("date exploding");
+            date.setFullYear(currentDate.getFullYear() - (person.registered.expire + getRandomInt(3)));
+            error.push("expired");
+            person.registered.date = date.toISOString();
+        },
+    };
+
+    Object.entries(trolls).forEach((troll) => {
+        console.log(troll);
+        if (rng(getRandomInt(100), troll[1])) {
+            console.log("WHASOHDUW  ");
+            funkyTown[troll[0]](person);
+        }
+    });
+
+    /*     // wrong picture
     if (rng(getRandomInt(100), 90)) {
         const replacement = getRandomInt(100);
         // matches filename
@@ -36,21 +59,8 @@ function trollPerson(person) {
     if (rng(getRandomInt(100), 90)) {
         person.location.country = "Real Place Land";
         error.push("location");
-    }
+    } */
 
-    // wrong place
-    const currentDate = new Date();
-    person.registered.expire = getRandomInt(5);
-    if (rng(getRandomInt(100), 50)) {
-        const date = new Date(person.registered.date);
-        date.setFullYear(currentDate.getFullYear() - (person.registered.expire + getRandomInt(3)));
-        person.registered.date = date.toISOString();
-        error.push("expired");
-    } else {
-        const date = new Date(person.registered.date);
-        date.setFullYear(currentDate.getFullYear() - getRandomInt(person.registered.expire - 1));
-        person.registered.date = date.toISOString();
-    }
     console.log(error);
     return error;
 }
