@@ -1,5 +1,6 @@
 import "./styles/style.css";
 import { DOM } from "./dom.js";
+import { days } from "./day.js";
 import { trollPerson, getRandomInt } from "./troll.js";
 const gameData = {
     day: 0,
@@ -10,11 +11,12 @@ const gameData = {
     correct: 0,
     wrong: 0,
     queueSize: 3,
+    money: 0,
 };
 
-async function getPersons() {
+async function getPersons(count) {
     try {
-        const response = await fetch(`https://randomuser.me/api/?exc=login,phone,cell,email&results=${gameData.queueSize}`);
+        const response = await fetch(`https://randomuser.me/api/?exc=login,phone,cell,email&results=${count}`);
         if (response.error) {
             console.log("uh oh");
             throw new Error("api exploded");
@@ -54,21 +56,29 @@ function createPassport(person) {
     };
 }
 
+// start of new day
 function day() {
+    gameData.day++;
+    gameData.queueSize = days[gameData.day].queue;
     gameData.persons = [];
     gameData.errors = [];
     gameData.personIndex = 0;
     gameData.correct = 0;
     gameData.wrong = 0;
-    gameData.day++;
     DOM.day.innerText = `Day ${gameData.day}`;
-    const data = getPersons();
+    const data = getPersons(gameData.queueSize);
     data.then((result) => {
-        gameData.persons = result.results;
-        gameData.persons.forEach((person) => {
-            person.errors = trollPerson(person);
-        });
-        applicant(gameData.persons[gameData.personIndex]);
+        if (result === -1) {
+            // THE API EXPLODED. PANIC
+            DOM.queue.innerText = "the border is empty...";
+        } else {
+            // continue
+            gameData.persons = result.results;
+            gameData.persons.forEach((person) => {
+                person.errors = trollPerson(person);
+            });
+            applicant(gameData.persons[gameData.personIndex]);
+        }
     });
 }
 
