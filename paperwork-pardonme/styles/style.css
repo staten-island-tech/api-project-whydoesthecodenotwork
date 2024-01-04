@@ -17,3 +17,7 @@ body {
 #passport {
     display: flex;
 }
+
+dialog::backdrop {
+    background-color: #000000;
+}

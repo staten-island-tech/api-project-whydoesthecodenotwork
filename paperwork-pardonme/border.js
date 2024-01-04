@@ -34,12 +34,14 @@ async function getPersons(count) {
 function createPassport(person) {
     gameData.passport = window.open("passport.html", "passport", `popup,width=${window.innerWidth / 2},height=${window.innerHeight / 2}`);
     gameData.passport.onload = (event) => {
+        const alt = gameData.errors.includes("photo") ? `a fake picture of ${person.name.first}` : `a picture of ${person.name.first}`;
+        // when the Photo Matching is Accessible 😳😳😳
         gameData.passport.document.querySelector("body").insertAdjacentHTML(
             "beforeend",
             `
             <h2>${person.name.first}'s passport</h2>
             <section>
-                <img class="passportphoto" src=${person.picture.medium}></img>
+                <img class="passportphoto" src=${person.picture.medium} alt="${alt}"></img>
                 <p>name: ${person.name.first} ${person.name.last}</p>
                 <p>sex: ${person.gender}</p>
                 <p>place of origin: ${person.location.state}</p>
@@ -108,10 +110,22 @@ DOM.stamp.addEventListener("click", function () {
         if (gameData.errors.length === 0) {
             console.log("awesome");
             gameData.correct++;
+            gameData.money += 10;
         } else {
-            alert("you failed and will now be exploded");
             console.log("haha", gameData.errors);
             gameData.wrong++;
+            switch (gameData.wrong) {
+                case 1:
+                    alert("oh brother");
+                    break;
+                case 2:
+                    alert("oh BROTHER");
+                    break;
+                default:
+                    alert("ok buddy. you are losing $20 for that");
+                    gameData.money -= 20;
+                    break;
+            }
         }
     } else {
         // console.log(DOM.reason.value);

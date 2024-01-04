@@ -30,8 +30,22 @@ function trollPerson(person, trolls) {
         date: function (person) {
             console.log("date exploding");
             date.setFullYear(currentDate.getFullYear() - (person.registered.expire + getRandomInt(3)));
-            error.push("expired");
             person.registered.date = date.toISOString();
+            error.push("expired");
+        },
+        photo: function (person) {
+            const replacement = getRandomInt(100);
+            // matches filename
+            const re = /[0,1,2,3,4,5,6,7,8,9].\.jpg/;
+            if (replacement !== person.picture.medium.match()) {
+                // give up if the rng says so
+                person.picture.medium = person.picture.medium.replace(re, `${replacement}.jpg`);
+                error.push("photo");
+            }
+        },
+        place: function (person) {
+            person.location.country = "Real Place Land";
+            error.push("location");
         },
     };
 
@@ -42,24 +56,6 @@ function trollPerson(person, trolls) {
             funkyTown[troll[0]](person);
         }
     });
-
-    /*     // wrong picture
-    if (rng(getRandomInt(100), 90)) {
-        const replacement = getRandomInt(100);
-        // matches filename
-        const re = /[0,1,2,3,4,5,6,7,8,9].\.jpg/;
-        if (replacement !== person.picture.medium.match()) {
-            // give up if the rng says so
-            person.picture.medium = person.picture.medium.replace(re, `${replacement}.jpg`);
-            error.push("photo");
-        }
-    }
-
-    // wrong place
-    if (rng(getRandomInt(100), 90)) {
-        person.location.country = "Real Place Land";
-        error.push("location");
-    } */
 
     console.log(error);
     return error;
