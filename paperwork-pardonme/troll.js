@@ -52,7 +52,6 @@ function trollPerson(person, trolls) {
     Object.entries(trolls).forEach((troll) => {
         console.log(troll);
         if (rng(getRandomInt(100), troll[1])) {
-            console.log("WHASOHDUW  ");
             funkyTown[troll[0]](person);
         }
     });

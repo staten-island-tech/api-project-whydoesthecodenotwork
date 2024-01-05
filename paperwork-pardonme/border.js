@@ -13,6 +13,7 @@ const gameData = {
     queueSize: 3,
     money: 0,
     trolls: [],
+    message: "",
 };
 
 async function getPersons(count) {
@@ -42,14 +43,14 @@ function createPassport(person) {
             <h2>${person.name.first}'s passport</h2>
             <section>
                 <img class="passportphoto" src=${person.picture.medium} alt="${alt}"></img>
-                <p>name: ${person.name.first} ${person.name.last}</p>
-                <p>sex: ${person.gender}</p>
-                <p>place of origin: ${person.location.state}</p>
-                <p>dob: ${new Date(person.dob.date).toDateString().substring(4)}</p>
-                <p>issue date: ${new Date(person.registered.date).toDateString().substring(4)}, expires after ${person.registered.expire} year${
+                <h3>name: ${person.name.first} ${person.name.last}</h3>
+                <h3>sex: ${person.gender}</h3>
+                <h3>place of origin: ${person.location.state}</h3>
+                <h3>dob: ${new Date(person.dob.date).toDateString().substring(4)}</h3>
+                <h3>issue date: ${new Date(person.registered.date).toDateString().substring(4)}, expires after ${person.registered.expire} year${
                 person.registered.expire > 1 ? "s" : ""
-            }</p>
-            </section>
+            }</h3>
+                </section>
             `
         );
         gameData.passport.onbeforeunload = function () {
@@ -62,6 +63,7 @@ function createPassport(person) {
 // start of new day
 function day() {
     gameData.day++;
+    gameData.message = days[gameData.day].message;
     gameData.queueSize = days[gameData.day].queue;
     gameData.trolls = days[gameData.day].trolls;
     gameData.persons = [];
@@ -76,15 +78,47 @@ function day() {
             // THE API EXPLODED. PANIC
             DOM.queue.innerText = "the border is empty...";
         } else {
-            // continue
+            // troll everyone
             gameData.persons = result.results;
             gameData.persons.forEach((person) => {
                 person.errors = trollPerson(person, gameData.trolls);
             });
-            // summon the first applicant
-            applicant(gameData.persons[gameData.personIndex]);
+            // add denial reasons based on rules
+            const rules = {
+                none: '<option value="none" selected>this is fine</option>',
+                gender: '<option value="gender">the SEX is wrong</option>',
+                location: '<option value="location">the ORIGIN LOCATION is wrong</option>',
+                dob: '<option value="dob">the DATE OF BIRTH is wrong</option>',
+                date: '<option value="expired">the document is EXPIRED</option>}',
+                photo: `<option value="photo">the PHOTO doesn't match</option>`,
+            };
+            DOM.reason.replaceChildren();
+            DOM.reason.insertAdjacentHTML("beforeend", rules.none);
+            console.log(Object.keys(gameData.trolls));
+            Object.keys(gameData.trolls).forEach((troll) => {
+                DOM.reason.insertAdjacentHTML("beforeend", rules[troll]);
+            });
+            // api done doing its thing. let the player start
+            DOM.note.querySelector("button").disabled = false;
         }
     });
+}
+
+function note() {
+    day();
+    DOM.note.innerHTML = `
+    <section>
+    <h2>welcome to day ${gameData.day}</h2>
+    <h2>${gameData.message}</h2>
+    <button autofocus disabled>start</button>
+    </section>
+    `;
+    DOM.note.querySelector("button").addEventListener("click", function () {
+        // summon the first applicant
+        applicant(gameData.persons[gameData.personIndex]);
+        DOM.note.close();
+    });
+    DOM.note.showModal();
 }
 
 function applicant(person) {
@@ -100,10 +134,6 @@ function applicant(person) {
         this.disabled = true;
     });
 }
-
-DOM.discrepancy.addEventListener("input", function () {
-    console.log(DOM.reason.value);
-});
 
 DOM.stamp.addEventListener("click", function () {
     if (DOM.reason.selectedIndex === 0) {
@@ -156,17 +186,17 @@ DOM.stamp.addEventListener("click", function () {
     }
 });
 
-day();
-
 function endDay() {
     DOM.eod.innerHTML = `
     <h2>end of day ${gameData.day}</h2>
     <h3>you got ${gameData.correct} right and ${gameData.wrong} wrong</h3>
     <button autofocus>OK</button>
     `;
-    day();
     DOM.eod.querySelector("button").addEventListener("click", function () {
+        note();
         DOM.eod.close();
     });
     DOM.eod.showModal();
 }
+
+note();

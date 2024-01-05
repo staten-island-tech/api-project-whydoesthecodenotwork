@@ -5,6 +5,7 @@ const DOM = {
     border: document.getElementById("border"),
     heading: document.getElementById("heading"),
     controls: document.getElementById("controls"),
+    note: document.getElementById("note"),
     eod: document.getElementById("endofday"),
     queue: document.getElementById("queue"),
     day: document.getElementById("day"),
