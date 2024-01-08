@@ -1,0 +1,15 @@
+:root {
+    box-sizing: border-box;
+}
+
+* {
+    text-align: center;
+}
+
+* {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.passportphoto {
+    filter: grayscale(100%);
+}
