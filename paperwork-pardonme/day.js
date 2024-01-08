@@ -2,7 +2,7 @@
 const days = {
     1: {
         queue: 10,
-        trolls: { expire: 60 },
+        trolls: { date: 60 },
         message: `
             <h3>and welcome to your new job as borderman.</h3>
             <h3><em>as borderman, your job is simple:</em></h3>
@@ -27,7 +27,7 @@ const days = {
         friend: "Barney",
     },
     3: {
-        queue: 10,
+        queue: 15,
         trolls: { date: 90, photo: 90, place: 80, gender: 80, dob: 80 },
         message: `
                 <h3>dear borderman:</h3>

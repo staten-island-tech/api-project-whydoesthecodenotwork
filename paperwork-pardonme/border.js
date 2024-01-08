@@ -108,6 +108,7 @@ function day() {
             });
             // api done doing its thing. let the player start
             DOM.note.querySelector("button").disabled = false;
+            DOM.note.querySelector("button").innerText = "start";
             DOM.note.querySelector("button").focus();
         }
     });
@@ -121,7 +122,7 @@ function note() {
     <h2>welcome to day ${gameData.day}</h2>
     ${gameData.message}
     <h3>you have ${gameData.money} credits</h3>
-    <button disabled>start</button>
+    <button disabled>loading...</button>
     </section>
     `;
     DOM.note.querySelector("button").addEventListener("click", function () {

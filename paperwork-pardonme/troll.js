@@ -28,7 +28,6 @@ function trollPerson(person, trolls) {
             error.push("gender");
         },
         date: function (person) {
-            console.log("date exploding");
             date.setFullYear(currentDate.getFullYear() - (person.registered.expire + getRandomInt(3)));
             person.registered.date = date.toISOString();
             error.push("expired");
@@ -54,13 +53,11 @@ function trollPerson(person, trolls) {
     };
 
     Object.entries(trolls).forEach((troll) => {
-        console.log(troll);
         if (rng(getRandomInt(100), troll[1])) {
             funkyTown[troll[0]](person);
         }
     });
 
-    console.log(error);
     return error;
 }
 
