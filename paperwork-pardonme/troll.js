@@ -47,6 +47,10 @@ function trollPerson(person, trolls) {
             person.location.country = "Real Place Land";
             error.push("location");
         },
+        dob: function (person) {
+            person.dob.date = currentDate.toISOString();
+            error.push("dob");
+        },
     };
 
     Object.entries(trolls).forEach((troll) => {

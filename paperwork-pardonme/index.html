@@ -2,37 +2,36 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>paperwork pardonme</title>
+        <title>paperwork, pardon me</title>
     </head>
     <body>
-        <h1>paperwork, pardon me</h1>
+        <h1><a title="click here to see the better version of this game by Lucas Pope" href="https://papersplea.se/">paperwork, pardon me</a></h1>
         <div id="heading">
-            <p id="day">day</p>
-            <p id="queue">queue</p>
+            <h2 id="day">day</h2>
+            <h2 id="queue">queue</h2>
         </div>
         <div id="border">
-            <h2>pretend there are people here</h2>
         </div>
         <div id="controls">
             <div id="rules">
-                <h2>my goodness..........</h2>
+                <h2>what will you do?</h2>
             </div>
             <div id="discrepancy">
                 <p>
-                    whattt
-                    <select id="reason">
-                        <option value="none" selected>this is fine</option>
-                        <option value="gender">the SEX is wrong</option>
-                        <option value="location">the ORIGIN LOCATION is wrong</option>
-                        <option value="dob">the DATE OF BIRTH is wrong</option>
-                        <option value="expired">the document is EXPIRED</option>
-                        <option value="photo">the PHOTO doesn't match</option>
-                        <option value="missing">there is no DOCUMENT</option>
-                    </select>
+                    select a denial reason, or "this is fine" to allow this person through
                 </p>
-                <input type="submit" id="stamp"></input>
+                <select id="reason" aria-label="dropdown to allow or select a denial reason">
+                    <option value="none" selected>this is fine</option>
+                    <option value="gender">the SEX is wrong</option>
+                    <option value="location">the ORIGIN LOCATION is wrong</option>
+                    <option value="dob">the DATE OF BIRTH is wrong</option>
+                    <option value="expired">the document is EXPIRED</option>
+                    <option value="photo">the PHOTO doesn't match</option>
+                    <option value="missing">there is no DOCUMENT</option>
+                </select>
+                <input type="submit" id="stamp" value="submit your judgement"></input>
             </div>
         </div>
         <dialog id="note"></dialog>

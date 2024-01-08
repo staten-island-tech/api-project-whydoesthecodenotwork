@@ -8,9 +8,15 @@ body {
 }
 
 #border {
-    height: 20vh;
     width: 100%;
-    border-bottom: 4px black solid;
+    border-bottom: 4px #000000 solid;
+    padding-bottom: 1rem;
+}
+
+#queue {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
 }
 
 /* button to open passport */
@@ -18,6 +24,31 @@ body {
     display: flex;
 }
 
+dialog {
+    max-width: 75%;
+}
+
+/* no one should be playing this on a phone, but for those who dare, here is a media query. */
+@media screen and (max-width: 480px) {
+    dialog {
+        max-width: 100%;
+    }
+}
+
 dialog::backdrop {
     background-color: #000000;
+}
+
+*:focus-visible {
+    border: 4px #ff0000 inset;
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    text-decoration: underline;
+}
+
+* {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
