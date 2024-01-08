@@ -3,7 +3,7 @@ import { DOM } from "./dom.js";
 import { days } from "./day.js";
 import { trollPerson, getRandomInt } from "./troll.js";
 const gameData = {
-    day: 0,
+    day: 2,
     personIndex: 0,
     persons: [],
     passport: null,
@@ -18,6 +18,7 @@ const gameData = {
     people: [],
     cost: 15,
     friend: "",
+    startTime: null,
 };
 
 async function getPersons(count) {
@@ -46,16 +47,16 @@ function createPassport(person) {
         gameData.passport.document.body.insertAdjacentHTML(
             "beforeend",
             `
-            <h2>${person.name.first}'s passport</h2>
+            <h1>${person.name.first}'s passport</h1>
             <section>
                 <img class="passportphoto" src=${person.picture.medium} alt="${alt}"></img>
-                <h3>name: ${person.name.first} ${person.name.last}</h3>
-                <h3>sex: ${person.gender}</h3>
-                <h3>place of origin: ${person.location.state}</h3>
-                <h3>dob: ${new Date(person.dob.date).toDateString().substring(4)}</h3>
-                <h3>issue date: ${new Date(person.registered.date).toDateString().substring(4)}, expires after ${person.registered.expire} year${
+                <h2>name: ${person.name.first} ${person.name.last}</h3>
+                <h2>sex: ${person.gender}</h2>
+                <h2>place of origin: ${person.location.state}</h2>
+                <h2>dob: ${new Date(person.dob.date).toDateString().substring(4)}</h2>
+                <h2>issue date: ${new Date(person.registered.date).toDateString().substring(4)}, expires after ${person.registered.expire} year${
                 person.registered.expire === 1 ? "" : "s"
-            }</h3>
+            }</h2>
                 </section>
             `
         );
@@ -67,11 +68,22 @@ function createPassport(person) {
 
 // start of new day
 function day() {
+    gameData.startTime = Date.now();
+    let tempDay = -1;
     gameData.day++;
+    if (gameData.day >= 4) {
+        tempDay = gameData.day;
+        gameData.day = 4;
+        gameData.queueSize = (gameData.people.length + 1) * 3 + 10;
+    } else {
+        gameData.queueSize = days[gameData.day].queue;
+    }
     gameData.message = days[gameData.day].message;
-    gameData.queueSize = days[gameData.day].queue;
     gameData.trolls = days[gameData.day].trolls;
     gameData.friend = days[gameData.day].friend;
+    if (tempDay !== -1) {
+        gameData.day = tempDay;
+    }
     gameData.persons = [];
     gameData.errors = [];
     gameData.personIndex = 0;
@@ -155,12 +167,14 @@ DOM.stamp.addEventListener("click", function () {
             right();
         } else {
             wrong("allow");
+            // right();
         }
     } else {
         if (gameData.errors.includes(DOM.reason.value)) {
             right();
         } else {
             wrong("deny");
+            // right();
         }
         DOM.reason.selectedIndex = 0;
     }
@@ -169,9 +183,13 @@ DOM.stamp.addEventListener("click", function () {
         gameData.passport.close();
     }
     if (gameData.personIndex < gameData.persons.length) {
-        applicant(gameData.persons[gameData.personIndex]);
+        if (Date.now() - gameData.startTime <= 300000) {
+            applicant(gameData.persons[gameData.personIndex]);
+        } else {
+            endDay("time");
+        }
     } else {
-        endDay();
+        endDay("fc");
     }
     document.querySelector("#passport").focus();
 });
@@ -218,7 +236,7 @@ function wrong(reason) {
     };
 }
 
-function endDay() {
+function endDay(result) {
     const gifts = [];
     function gift(person) {
         const gift = ["has something for you", "has a gift for you", "brought you some money", "gave you some money", "got some money for you"];
@@ -239,24 +257,33 @@ function endDay() {
         gameData.people.push(gameData.friend);
         gift(gameData.friend);
     }
-
+    let bonus = gameData.wrong === 0 ? 20 : 5;
+    if (result === "fc") {
+        gameData.money += bonus;
+    }
     DOM.eod.innerHTML = `
     <h2>end of day ${gameData.day}</h2>
     <h3>you got ${gameData.correct} right and ${gameData.wrong} wrong</h3>
     <h3>you have ${gameData.money} credits</h3>
+    <h3>your family members include: ${gameData.people.join(", ")}</h3>
     <button autofocus>continue</button>
     `;
     gifts.forEach((gift) => {
         DOM.eod.querySelector("button").insertAdjacentHTML("beforebegin", `<h3>${gift}</h3>`);
     });
-    if (gameData.day === 3) {
+    if (result === "fc") {
         DOM.eod
             .querySelector("button")
-            .insertAdjacentHTML("beforebegin", `<h3>your boss has promoted you to being retired. congratulations. you did it. you won. cool.</h3>`);
-        DOM.eod.querySelector("button").remove();
-        DOM.eod.showModal();
-        return;
+            .insertAdjacentHTML("beforebegin", `<h3>your boss gave you ${bonus} credits for finishing your queue within 5 minutes</h3>`);
     }
+    // if (gameData.day === 3) {
+    //     DOM.eod
+    //         .querySelector("button")
+    //         .insertAdjacentHTML("beforebegin", `<h3>your boss has promoted you to being retired. congratulations. you did it. you won. cool.</h3>`);
+    //     DOM.eod.querySelector("button").remove();
+    //     DOM.eod.showModal();
+    //     return;
+    // }
     DOM.eod.querySelector("button").addEventListener("click", function () {
         const cost = (gameData.people.length + 1) * gameData.cost;
         if (gameData.money >= cost) {
@@ -283,8 +310,10 @@ function endDay() {
             }
             DOM.eod.innerHTML = `
                 <h2><em>game over</em></h2>
-                <h2>unfortunately, ${gameData.money} credits isn't enough to make ends meet.</h2>
+                <h3>unfortunately, ${gameData.money} credits isn't enough to make ends meet.</h3>
                 <p>${gameOverMessage}</p>
+                <p>your family was this big at its peak: ${gameData.people.join(", ")}</p>
+                <p>you made it to ${gameData.day}</p>
                 `;
         }
     });
