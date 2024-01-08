@@ -3,7 +3,7 @@ import { DOM } from "./dom.js";
 import { days } from "./day.js";
 import { trollPerson, getRandomInt } from "./troll.js";
 const gameData = {
-    day: 2,
+    day: 0,
     personIndex: 0,
     persons: [],
     passport: null,
@@ -233,6 +233,9 @@ function wrong(reason) {
             <h3>(feel free to close this window)</h3>
             `
         );
+        if (reason === "allow") {
+            gameData.citation.document.querySelector("h2").insertAdjacentHTML("afterend", `<h2>errors: ${gameData.errors.join(", ")}</h2>`);
+        }
     };
 }
 
@@ -265,9 +268,11 @@ function endDay(result) {
     <h2>end of day ${gameData.day}</h2>
     <h3>you got ${gameData.correct} right and ${gameData.wrong} wrong</h3>
     <h3>you have ${gameData.money} credits</h3>
-    <h3>your family members include: ${gameData.people.join(", ")}</h3>
     <button autofocus>continue</button>
     `;
+    if (gameData.people.length > 0) {
+        DOM.eod.querySelector("button").insertAdjacentHTML("beforebegin", `<h3>your family members include: ${gameData.people.join(", ")}</h3>`);
+    }
     gifts.forEach((gift) => {
         DOM.eod.querySelector("button").insertAdjacentHTML("beforebegin", `<h3>${gift}</h3>`);
     });
@@ -275,6 +280,8 @@ function endDay(result) {
         DOM.eod
             .querySelector("button")
             .insertAdjacentHTML("beforebegin", `<h3>your boss gave you ${bonus} credits for finishing your queue within 5 minutes</h3>`);
+    } else {
+        DOM.eod.querySelector("button").insertAdjacentHTML("beforebegin", `<h3>you did not make it through the queue</h3>`);
     }
     // if (gameData.day === 3) {
     //     DOM.eod
