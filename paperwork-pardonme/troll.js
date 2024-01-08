@@ -33,7 +33,7 @@ function trollPerson(person, trolls) {
             error.push("expired");
         },
         photo: function (person) {
-            const replacement = getRandomInt(100);
+            const replacement = getRandomInt(99);
             // matches filename
             const re = /[0,1,2,3,4,5,6,7,8,9].\.jpg/;
             if (replacement !== person.picture.medium.match()) {
@@ -42,8 +42,8 @@ function trollPerson(person, trolls) {
                 error.push("photo");
             }
         },
-        place: function (person) {
-            person.location.country = "Real Place Land";
+        location: function (person) {
+            person.location.state = "Real Place Land";
             error.push("location");
         },
         dob: function (person) {
